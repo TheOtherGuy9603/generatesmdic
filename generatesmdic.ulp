@@ -1,0 +1,127 @@
+// run rectangularsmd width height padspacing padwidth padlength numpinsx numpinsy unpinned [x position] [y position]
+
+
+output("/tmp/ulp_output.txt","at") {
+	/*
+	if (argc != 8 && argc != 10) {
+	dlgMessageBox("Incorrect number of arguments","Ok");
+	exit(1);
+	}
+	*/
+
+	real width = strtod(argv[1]);
+	real height = strtod(argv[2]);
+	real padspacing = strtod(argv[3]);
+	real padwidth = strtod(argv[4]);
+	real padlength = strtod(argv[5]);
+	real numpinsx = strtod(argv[6]);
+	real numpinsy = strtod(argv[7]);
+	real unpinned = strtod(argv[8]);
+
+	real x = 0;
+	real y = 0;
+	if (argc >= 9) {
+		x = strtod(argv[9]);
+		y = strtod(argv[10]);
+		}
+
+	// left side smds
+	
+	
+	string command = "";
+	command += "CHANGE LAYER 21; ";
+	string s = "";
+	sprintf(s,"GRID mm 0.05 20; WIRE (%f %f) (%f %f) (%f %f) (%f %f) (%f %f); ",
+		x+width/2.0,y+height/2.0,
+		x+width/2.0,y-height/2.0,
+		x-width/2.0,y-height/2.0,
+		x-width/2.0,y+height/2.0,
+		x+width/2.0,y+height/2.0
+		);
+	command += s;
+
+	int pinnum = 0;
+	string smd = "";
+	real xpos, ypos;
+
+
+	// left side
+
+	real xwid = padlength;
+	real ywid = padwidth;
+	int numpins = numpinsy;
+	xpos = x - width/2.0 - xwid/2.0;
+
+	for(int i=0; i<numpins; i++)
+	{
+		pinnum += 1;
+
+		ypos = y + height/2 - unpinned/2 - i*padspacing;
+
+		smd = "";
+		sprintf(smd, "SMD %f %f -0 \'1\' \'P%d\' (%f %f); ", xwid, ywid, pinnum, xpos, ypos);
+		command += smd;
+		
+	}
+
+
+	// bottom
+
+	xwid = padwidth;
+	ywid = padlength;
+	numpins = numpinsx;
+	ypos = y - height/2.0 - ywid/2.0;
+
+	for(i=0; i<numpins; i++)
+	{
+		pinnum += 1;
+
+		xpos = y - width/2 + unpinned/2 + i*padspacing;
+
+		smd = "";
+		sprintf(smd, "SMD %f %f -0 \'1\' \'P%d\' (%f %f); ", xwid, ywid, pinnum, xpos, ypos);
+		command += smd;
+		
+	}
+	
+
+	// right
+
+	xwid = padlength;
+	ywid = padwidth;
+	numpins = numpinsy;
+	xpos = x + width/2.0 + xwid/2.0;
+
+	for(i=0; i<numpins; i++)
+	{
+		pinnum += 1;
+
+		ypos = y - height/2 + unpinned/2 + i*padspacing;
+
+		smd = "";
+		sprintf(smd, "SMD %f %f -0 \'1\' \'P%d\' (%f %f); ", xwid, ywid, pinnum, xpos, ypos);
+		command += smd;
+		
+	}
+	
+	
+	// top
+
+	xwid = padwidth;
+	ywid = padlength;
+	numpins = numpinsx;
+	ypos = y + height/2.0 + ywid/2.0;
+
+	for(i=0; i<numpins; i++)
+	{
+		pinnum += 1;
+
+		xpos = y + width/2 - unpinned/2 - i*padspacing;
+
+		smd = "";
+		sprintf(smd, "SMD %f %f -0 \'1\' \'P%d\' (%f %f); ", xwid, ywid, pinnum, xpos, ypos);
+		command += smd;
+		
+	}
+	exit(command);
+}
